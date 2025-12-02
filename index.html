@@ -88,7 +88,7 @@ footer{font-size:13px;color:#475569;margin-top:12px}
   </form>
   <div id="output" class="result" style="display:none"></div>
   <footer>
-    <div>نظام الدرجات: كل خيار يقيم من 1 (أدنى) إلى 4 (أعلى). توزع الأسئلة: 33 / 33 / 34.</div>
+    <div>تم إعداد هذا الاستبيان متوافقا مع منهجية الذكاء العاطفي المعتمدة من 6seconds</div>
   </footer>
 </main>
 
@@ -331,8 +331,10 @@ document.getElementById('submit').addEventListener('click',()=>{
 document.getElementById('reset').addEventListener('click',()=>{document.getElementById('quiz').reset();document.getElementById('output').style.display='none';});
 document.getElementById('download').addEventListener('click',()=>{const htmlContent='<!doctype html><html lang="ar">'+document.documentElement.innerHTML+'</html>';const blob=new Blob([htmlContent],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='نتائج_الاستبيان.html';a.click();});
 </script>
+<div class="footer" style="margin-top:40px; text-align:center; font-weight:bold;">إعداد وبرمجة مشرف مهارات القرن 21<br>مصطفى حسين</div>
 </body>
 </html>
+
 
 
 
