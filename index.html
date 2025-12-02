@@ -255,11 +255,11 @@ function calculateResults(){
     answers.push(parseInt(v,10));
   }
   const total=answers.reduce((a,b)=>a+b,0);
-  const comp1=answers.slice(0,33).reduce((a,b)=>a+b,0);
-  const comp2=answers.slice(33,66).reduce((a,b)=>a+b,0);
-  const comp3=answers.slice(66,100).reduce((a,b)=>a+b,0);
+  const comp1=answers.slice(0,20).reduce((a,b)=>a+b,0);
+  const comp2=answers.slice(20,70).reduce((a,b)=>a+b,0);
+  const comp3=answers.slice(70,100).reduce((a,b)=>a+b,0);
 
-  const max1=33*4; const max2=33*4; const max3=34*4; const maxtotal=100*4;
+  const max1=20*4; const max2=50*4; const max3=30*4; const maxtotal=100*4;
   const pTotal=Math.round((total/maxtotal)*100);
   const p1=Math.round((comp1/max1)*100);
   const p2=Math.round((comp2/max2)*100);
@@ -333,6 +333,7 @@ document.getElementById('download').addEventListener('click',()=>{const htmlCont
 </script>
 </body>
 </html>
+
 
 
 
