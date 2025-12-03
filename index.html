@@ -9,7 +9,7 @@
 <style>
 :root{font-family: 'Segoe UI', Tahoma, Arial, sans-serif;}
 body{direction:rtl;margin:0;padding:0;background:#f5f7fb;color:#111}
-header{background:#114b8a;color:#fff;padding:18px 20px}
+header{background:#114b8a;color:#fff;padding:18px 20px; position: relative;}
 .container{max-width:900px;margin:18px auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 6px 18px rgba(16,24,40,.08)}
 h1{margin:0;font-size:20px}
 p.lead{color:#334155}
@@ -71,6 +71,16 @@ footer{font-size:13px;color:#475569;margin-top:12px}
   box-sizing: border-box;
 }
 
+/* إضافة اللوجو - حجم كبير */
+.logo {
+  position: absolute;
+  left: 20px;
+  top: 10px;
+  height: 120px; /* تكبير الحجم من 60px إلى 80px */
+  width: auto;
+  z-index: 10;
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 12px;
@@ -109,6 +119,18 @@ footer{font-size:13px;color:#475569;margin-top:12px}
   .actions button {
     width: 100%;
   }
+  
+  /* تعديل اللوجو للجوال */
+  .logo {
+    position: relative;
+    left: 0;
+    top: 0;
+    height: 70px; /* تكبير الحجم للجوال */
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 @media (max-width: 400px) {
@@ -128,12 +150,18 @@ footer{font-size:13px;color:#475569;margin-top:12px}
   .question {
     padding: 8px;
   }
+  
+  .logo {
+    height: 60px; /* تكبير الحجم للجوال الصغير */
+  }
 }
 </style>
 </head>
 <body>
 <div id="passwordOverlay" class="password-overlay">
   <div class="password-box">
+    <!-- إضافة اللوجو في نافذة كلمة المرور - حجم كبير -->
+    <img src="21csu.png" alt="لوجو مهارات القرن 21" style="height: 100px; margin-bottom: 20px; width: auto;">
     <h2>🔒 الدخول إلى مقياس الذكاء العاطفي</h2>
     <p>الرجاء إدخال كلمة المرور للوصول إلى المقياس</p>
     <input type="password" id="passwordInput" class="password-input" placeholder="أدخل كلمة المرور">
@@ -152,6 +180,8 @@ footer{font-size:13px;color:#475569;margin-top:12px}
 </div>
 
 <header>
+  <!-- إضافة اللوجو في الركن العلوي الأيسر - حجم كبير -->
+  <img src="21csu.png" alt="لوجو مهارات القرن 21" class="logo">
   <div class="container" style="background:transparent;padding:0">
     <h1>مقياس الذكاء العاطفي</h1>
     <div class="student-info">
@@ -646,53 +676,58 @@ async function generateAndDownloadPDF() {
     const date = new Date().toLocaleDateString('ar-SA');
     
     pdfContainer.innerHTML = `
-      <div style="font-family: 'Arial', sans-serif; padding: 20px; text-align: right;">
+      <div style="font-family: 'Arial', sans-serif; padding: 20px; text-align: right; position: relative;">
+        <!-- اللوجو في الركن العلوي الأيسر - حجم كبير -->
+        <div style="position: absolute; left: 20px; top: 20px;">
+          <img src="21csu.png" alt="لوجو مهارات القرن 21" style="height: 120px; width: auto;">
+        </div>
+        
         <!-- العنوان -->
-        <div style="text-align: center; margin-bottom: 30px; background: #114b8a; color: white; padding: 15px; border-radius: 8px;">
-          <h1 style="margin: 0; font-size: 28px;">نتائج مقياس الذكاء العاطفي</h1>
-          <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">بناءً على نموذج 6seconds</p>
+        <div style="text-align: center; margin-bottom: 40px; padding: 15px; border-radius: 8px;">
+          <h1 style="margin: 0; font-size: 28px; color: #114b8a;">نتائج مقياس الذكاء العاطفي</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px; color: #666;">بناءً على نموذج 6seconds</p>
         </div>
         
         <!-- معلومات الطالب -->
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 25px; border-right: 4px solid #0b5ed7;">
-          <h3 style="margin: 0 0 10px 0; color: #114b8a;">معلومات الطالب:</h3>
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-right: 4px solid #0b5ed7; margin-top: 60px;">
+          <h3 style="margin: 0 0 15px 0; color: #114b8a; font-size: 18px;">معلومات الطالب:</h3>
           <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
             <div style="margin-left: 20px;">
-              <p style="margin: 5px 0;"><strong>الاسم:</strong> ${name}</p>
-              <p style="margin: 5px 0;"><strong>الفصل:</strong> ${studentClass}</p>
+              <p style="margin: 8px 0; font-size: 16px;"><strong>الاسم:</strong> ${name}</p>
+              <p style="margin: 8px 0; font-size: 16px;"><strong>الفصل:</strong> ${studentClass}</p>
             </div>
             <div>
-              <p style="margin: 5px 0;"><strong>تاريخ الإختبار:</strong> ${date}</p>
-              <p style="margin: 5px 0;"><strong>عدد الأسئلة:</strong> 100 سؤال</p>
+              <p style="margin: 8px 0; font-size: 16px;"><strong>تاريخ الإختبار:</strong> ${date}</p>
+              <p style="margin: 8px 0; font-size: 16px;"><strong>عدد الأسئلة:</strong> 100 سؤال</p>
             </div>
           </div>
         </div>
         
         <!-- النتائج الإجمالية -->
-        <div style="background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-          <h3 style="margin: 0 0 15px 0; color: #114b8a;">النتيجة الإجمالية</h3>
+        <div style="background: #f1f5f9; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
+          <h3 style="margin: 0 0 20px 0; color: #114b8a; font-size: 18px;">النتيجة الإجمالية</h3>
           ${document.querySelector('#output h3').outerHTML}
           ${document.querySelector('#output .small').outerHTML}
           ${document.querySelector('#output .bar').outerHTML}
         </div>
         
         <!-- النتائج التفصيلية -->
-        <div style="margin-bottom: 25px;">
-          <h3 style="color: #114b8a; border-bottom: 2px solid #114b8a; padding-bottom: 8px;">تفصيل الكفاءات</h3>
+        <div style="margin-bottom: 30px;">
+          <h3 style="color: #114b8a; border-bottom: 2px solid #114b8a; padding-bottom: 10px; font-size: 18px;">تفصيل الكفاءات</h3>
           ${document.querySelector('#output .detailed-results').innerHTML}
         </div>
         
         <!-- التوصيات -->
-        <div style="background: #fff8e1; padding: 20px; border-radius: 8px; border: 1px solid #ffd54f; margin-bottom: 25px;">
-          <h3 style="margin: 0 0 15px 0; color: #ff8f00;">توصيات عامة</h3>
-          <p style="margin: 0; line-height: 1.6;">
+        <div style="background: #fff8e1; padding: 25px; border-radius: 8px; border: 2px solid #ffd54f; margin-bottom: 30px;">
+          <h3 style="margin: 0 0 15px 0; color: #ff8f00; font-size: 18px;">توصيات عامة</h3>
+          <p style="margin: 0; line-height: 1.6; font-size: 16px;">
             بناءً على نتائجك، ننصحك بالتركيز على تطوير المهارات التي حصلت على تقييم أقل. 
             يمكنك البدء بممارسة تمارين الذكاء العاطفي يوميًا لمدة 10 دقائق.
           </p>
         </div>
         
         <!-- تذييل -->
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px;">
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 14px;">
           <p style="margin: 5px 0;">تم إنشاء هذا التقرير تلقائيًا بواسطة مقياس الذكاء العاطفي</p>
           <p style="margin: 5px 0;">إعداد وبرمجة مشرف مهارات القرن 21 - مصطفى حسين</p>
           <p style="margin: 5px 0;">جميع الحقوق محفوظة © ${new Date().getFullYear()}</p>
@@ -707,7 +742,8 @@ async function generateAndDownloadPDF() {
     const canvas = await html2canvas(pdfContainer, {
       scale: 2,
       useCORS: true,
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      logging: false
     });
     
     // إنشاء PDF
@@ -734,13 +770,14 @@ async function generateAndDownloadPDF() {
     console.error('خطأ في إنشاء PDF:', error);
     alert('حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
     
-    // بديل: إنشاء PDF نصي مباشر
+    // بديل: إنشاء PDF نصي مباشر مع اللوجو
     try {
       const pdf = new jsPDF();
       const name = document.getElementById('studentName').value.trim();
       const studentClass = document.getElementById('studentClass').value.trim();
       const date = new Date().toLocaleDateString('ar-SA');
       
+      // إضافة النص العربي بشكل صحيح
       pdf.setFontSize(18);
       pdf.text('نتائج مقياس الذكاء العاطفي', 105, 20, null, null, 'center');
       
