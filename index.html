@@ -6,6 +6,7 @@
 <title>مقياس الذكاء العاطفي</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 :root{font-family: 'Segoe UI', Tahoma, Arial, sans-serif;}
 body{direction:rtl;margin:0;padding:0;background:#f5f7fb;color:#111}
@@ -48,7 +49,7 @@ footer{font-size:13px;color:#475569;margin-top:12px}
 .password-input { width: 100%; padding: 12px; margin: 15px 0; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; text-align: center; }
 .password-input:focus { border-color: #0b5ed7; outline: none; }
 .password-error { color: #dc3545; margin-top: 10px; display: none; }
-.password-info { font-size: 12px; color: #666; margin-top: 15px; text-align: right; }
+.password-info { font-size: 12px; color: #666; margin-top: 15px; text-align: right; direction: rtl; }
 
 .progress-container { margin: 20px 0; background: #f8fafc; padding: 15px; border-radius: 8px; }
 .progress-text { text-align: center; margin-bottom: 8px; font-weight: 600; color: #334155; }
@@ -60,6 +61,83 @@ footer{font-size:13px;color:#475569;margin-top:12px}
 .detailed-results th { padding: 10px; text-align: right; background: #114b8a; color: white; }
 .detailed-results td { padding: 10px; border-bottom: 1px solid #ddd; }
 .detailed-results tr:last-child td { border-bottom: none; }
+
+/* تنسيقات الرسم البياني - تصغير الحجم */
+.chart-container {
+  margin: 20px 0;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  height: 250px; /* تصغير الارتفاع */
+}
+
+.chart-container canvas {
+  width: 100% !important;
+  height: 200px !important; /* تصغير حجم الرسم البياني */
+}
+
+/* تنسيقات تحليل الكفاءات */
+.competency-analysis {
+  margin-top: 25px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.competency-card {
+  background: white;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  border-right: 3px solid #114b8a;
+}
+
+.competency-card h4 {
+  color: #114b8a;
+  margin-top: 0;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+  font-size: 16px;
+}
+
+.competency-level {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.level-high { background: #d4edda; color: #155724; }
+.level-medium { background: #fff3cd; color: #856404; }
+.level-low { background: #f8d7da; color: #721c24; }
+
+.analysis-section {
+  margin-bottom: 12px;
+}
+
+.analysis-section h5 {
+  color: #495057;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.analysis-section p, .analysis-section ul {
+  margin: 4px 0;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.analysis-section ul {
+  padding-right: 18px;
+}
+
+.analysis-section li {
+  margin-bottom: 4px;
+}
 
 .pdf-container {
   position: absolute;
@@ -76,7 +154,7 @@ footer{font-size:13px;color:#475569;margin-top:12px}
   position: absolute;
   left: 20px;
   top: 10px;
-  height: 120px; /* تكبير الحجم من 60px إلى 80px */
+  height: 80px;
   width: auto;
   z-index: 10;
 }
@@ -125,11 +203,24 @@ footer{font-size:13px;color:#475569;margin-top:12px}
     position: relative;
     left: 0;
     top: 0;
-    height: 70px; /* تكبير الحجم للجوال */
+    height: 70px;
     margin-bottom: 15px;
     display: block;
     margin-left: auto;
     margin-right: auto;
+  }
+  
+  .chart-container {
+    padding: 10px;
+    height: 220px;
+  }
+  
+  .chart-container canvas {
+    height: 180px !important;
+  }
+  
+  .competency-card {
+    padding: 12px;
   }
 }
 
@@ -152,7 +243,15 @@ footer{font-size:13px;color:#475569;margin-top:12px}
   }
   
   .logo {
-    height: 60px; /* تكبير الحجم للجوال الصغير */
+    height: 60px;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+  
+  .chart-container canvas {
+    height: 160px !important;
   }
 }
 </style>
@@ -161,7 +260,7 @@ footer{font-size:13px;color:#475569;margin-top:12px}
 <div id="passwordOverlay" class="password-overlay">
   <div class="password-box">
     <!-- إضافة اللوجو في نافذة كلمة المرور - حجم كبير -->
-    <img src="21csu.png" alt="لوجو مهارات القرن 21" style="height: 100px; margin-bottom: 20px; width: auto;">
+    <img src="21csu.png" alt="لوجو مهارات القرن 21" style="height: 70px; margin-bottom: 20px; width: auto;">
     <h2>🔒 الدخول إلى مقياس الذكاء العاطفي</h2>
     <p>الرجاء إدخال كلمة المرور للوصول إلى المقياس</p>
     <input type="password" id="passwordInput" class="password-input" placeholder="أدخل كلمة المرور">
@@ -172,7 +271,7 @@ footer{font-size:13px;color:#475569;margin-top:12px}
     </div>
     <div class="password-info">
       <strong>معلومات للمستخدمين:</strong>
-      <ul style="text-align: right; padding-right: 15px;">
+      <ul style="text-align: right; padding-right: 15px; margin: 8px 0;">
         <li>كلمة المرور الافتراضية: <code>1234</code></li>
       </ul>
     </div>
@@ -218,7 +317,10 @@ footer{font-size:13px;color:#475569;margin-top:12px}
       <button type="button" id="download" class="success">📥 تصدير PDF</button>
     </div>
   </form>
+  
+  <!-- حاوية النتائج -->
   <div id="output" class="result" style="display:none"></div>
+  
   <footer>
     <div>تم إعداد هذا المقياس متوافقا مع نموذج الذكاء العاطفي المعتمد من 6seconds</div>
   </footer>
@@ -291,7 +393,7 @@ const questions = [
 "أستطيع وصف مشاعري بعد انتهاء يومي الدراسي.",
 
 "ألاحظ الأوقات التي أكرر فيها نفس التصرف بدون تفكير.",
-"أعرف المواقف التي تجعلني أرفع صوتي.",
+"أعرف المواقط التي تجعلني أرفع صوتي.",
 "ألاحظ كيف يتغير سلوكي عندما أكون متعبًا.",
 "أتعرف على العادات التي تساعدني في الدراسة.",
 "ألاحظ ردود فعلي عندما يتغير الجدول الدراسي فجأة.",
@@ -312,7 +414,7 @@ const questions = [
 "أتوقع كيف سيتأثر الآخرون بقراراتي.",
 "أحسب الوقت الذي سيحتاجه أي عمل قبل أن أوافق عليه.",
 
-"أهدئ نفسي عندما أبدأ بالشعور بالغضب.",
+"أهدأ نفسي عندما أبدأ بالشعور بالغضب.",
 "أستطيع أن أتنفس بعمق عندما أشعر بالتوتر.",
 "أتحكم في رد فعلي عندما يزعجني أحد.",
 "أستطيع تأجيل انفعالي حتى أتأكد من الموقف.",
@@ -335,7 +437,7 @@ const questions = [
 "أضع لنفسي هدفًا صغيرًا وأحاول تحقيقه.",
 "أعمل لأنني أحب التعلم وليس فقط للحصول على درجات.",
 "أستمر في العمل حتى عندما لا يكون هناك مكافأة.",
-"أحاول تحسين مستواي حتى لو لم يقارني أحد بغيري.",
+"أحاول تحسين مستواي حتى لو لم يقارنني أحد بغيري.",
 "أستيقظ بنشاط عندما أعرف أن لدي هدفًا مهمًا اليوم.",
 "أنظم وقتي حتى أنتهي من مهامي.",
 "أذكر نفسي بسبب أهمية النجاح بالنسبة لي.",
@@ -521,14 +623,7 @@ function calculateResults(){
   const p2=Math.round((comp2/max2)*100);
   const p3=Math.round((comp3/max3)*100);
 
-  function interpret(p){
-    if(p>=80) return {label:'ممتاز', advice:'تحافظ على مستوى عالٍ؛ حافظ على ممارسة الوعي الذاتي ومشاركة الآخرين.'};
-    if(p>=60) return {label:'جيد', advice:'مستوى جيد لكنه يحتاج تحسينًا مستمرًا عبر تدريبات صغيرة يومية.'};
-    if(p>=40) return {label:'متوسط', advice:'مستوى متوسط؛ نوصي بخطة تدريبية مركزة ومهام عملية.'};
-    return {label:'قليل', advice:'مستوى يحتاج تطوير واضح؛ ابدأ ببرنامج تدريبي منتظم ودعم مهني إذا لزم.'};
-  }
-
-  return {total,pTotal,comp1,comp2,comp3,p1,p2,p3,interpTotal:interpret(pTotal),interp1:interpret(p1),interp2:interpret(p2),interp3:interpret(p3)};
+  return {total,pTotal,comp1,comp2,comp3,p1,p2,p3};
 }
 
 // ====================== إرسال النتائج إلى Google Sheet ======================
@@ -573,56 +668,311 @@ function getColorByScore(score) {
   return '#dc3545';
 }
 
+// ====================== التحليل حسب الكفاءات الثلاث ======================
+function analyzeCompetency(score) {
+    let level = "";
+    if (score >= 80) level = "مرتفعة";
+    else if (score >= 60) level = "متوسطة";
+    else level = "منخفضة";
+    return level;
+}
+
+function generateThreeCompetencyReport(knowScore, chooseScore, giveScore) {
+
+    // -------- 1) اعرف نفسك Know Yourself --------
+    let know = {};
+    know.level = analyzeCompetency(knowScore);
+
+    if (know.level === "مرتفعة") {
+        know.analysis = "لديك وعي قوي بالمشاعر، وتستطيع فهم ما تشعر به بدقة، وتتعرف على محفزاتك بسهولة.";
+        know.strengths = "• إدراك واضح للمشاعر.\n• القدرة على تسمية المشاعر بدقة.\n• ملاحظة الأنماط السلوكية الشخصية بسهولة.";
+        know.weaknesses = "قد يحدث أحيانًا مبالغة في التحليل الذاتي أو التفكير الزائد.";
+        know.recommendations =
+            "1. الاستمرار في تسجيل المشاعر اليومية.\n" +
+            "2. استخدام نموذج 'Name it to Tame it' لتحسين تنظيم المشاعر.\n" +
+            "3. تخصيص 10 دقائق أسبوعيًا لمراجعة أنماط السلوك وتقييمها.";
+    }
+    else if (know.level === "متوسطة") {
+        know.analysis = "لديك وعي جيد بالمشاعر، لكنك تحتاج لزيادة الدقة في التعرف على بعض الانفعالات.";
+        know.strengths = "• ملاحظة عامة للمشاعر.\n• قدرة أولية على تفسير السلوك.";
+        know.weaknesses = "• صعوبة في تحديد المشاعر في المواقف المعقدة.\n• أحيانًا يتم تجاهل الإشارات العاطفية المبكرة.";
+        know.recommendations =
+            "1. استخدام قائمة مفردات المشاعر يوميًا.\n" +
+            "2. تدوين 3 مواقف يوميًا وتحديد المشاعر الأساسية فيها.\n" +
+            "3. تدرب على سؤال النفس: ماذا أشعر ولماذا؟";
+    }
+    else {
+        know.analysis = "يوجد ضعف في الوعي العاطفي، ويحتاج الأمر إلى تدريب مباشر لتحديد المشاعر بدقة وفهمها.";
+        know.strengths = "• قابلية عالية للتطور.\n• استجابة جيدة عند التدريب المباشر.";
+        know.weaknesses = "• صعوبة في فهم المحفزات.\n• ارتباك في تفسير الانفعالات.\n• اندفاع أو تجنب بسبب غياب الوعي اللحظي.";
+        know.recommendations =
+            "1. ممارسة 'تسجيل المشاعر كل 3 ساعات'.\n" +
+            "2. استخدام خريطة Plutchik للأحاسيس.\n" +
+            "3. تمرين المرآة العاطفية: وصف ملامح الوجه أثناء المشاعر.";
+    }
+
+    // -------- 2) اختر نفسك Choose Yourself --------
+    let choose = {};
+    choose.level = analyzeCompetency(chooseScore);
+
+    if (choose.level === "مرتفعة") {
+        choose.analysis = "تتميز بقدرة عالية على إدارة مشاعرك وسلوكك واتخاذ قرارات واعية، حتى تحت الضغط.";
+        choose.strengths = "• إدارة ممتازة للتوتر.\n• القدرة على التفكير قبل الاستجابة.\n• اتخاذ قرارات مبنية على وعي وليس على ردود فعل تلقائية.";
+        choose.weaknesses = "أحيانًا قد يؤدي التحكم العالي إلى كبح المشاعر بدل تنظيمها.";
+        choose.recommendations =
+            "1. تطبيق استراتيجية (Pause-Think-Act).\n" +
+            "2. تمرين إعادة التفسير المعرفي للأحداث.\n" +
+            "3. وضع أهداف قصيرة أسبوعيًا لتحسين القرارات الواعية.";
+    }
+    else if (choose.level === "متوسطة") {
+        choose.analysis = "تستطيع إدارة نفسك في أغلب المواقف، لكن تتأثر أحيانًا عند حدوث ضغط عالٍ.";
+        choose.strengths = "• تحكم مقبول في الانفعالات.\n• القدرة على تهدئة النفس.\n• قدرة متوسطة على اتخاذ قرارات مدروسة.";
+        choose.weaknesses = "• انفلات بسيط تحت الضغط.\n• التردد في المواقف الحساسة.";
+        choose.recommendations =
+            "1. تدريب تنفس 4-6 لمدة 5 دقائق يوميًا.\n" +
+            "2. تحليل قرار واحد يوميًا: لماذا أخذته؟ ماذا شعرت حينها؟\n" +
+            "3. استخدام دفتر إدارة التوتر.";
+    }
+    else {
+        choose.analysis = "هناك صعوبة في إدارة السلوك والمشاعر، ويميل السلوك إلى الاندفاع أو التردد.";
+        choose.strengths = "• مرونة قابلة للتحسن.\n• استجابة سريعة للتمارين العملية.";
+        choose.weaknesses = "• ردود فعل مباشرة غير مدروسة.\n• ضعف في التحكم تحت الضغط.\n• صعوبة في الالتزام بخطط طويلة.";
+        choose.recommendations =
+            "1. توقف لمدة 10 ثوانٍ قبل أي رد.\n" +
+            "2. تمرين (What else could this mean?).\n" +
+            "3. تدريب أسبوعي على مهارات الحزم.";
+    }
+
+    // -------- 3) امنح نفسك Give Yourself --------
+    let give = {};
+    give.level = analyzeCompetency(giveScore);
+
+    if (give.level === "مرتفعة") {
+        give.analysis = "تعبر عن مستوى ناضج من التعاطف والهدف والعطاء، وتساهم في تعزيز العلاقات بقوة.";
+        give.strengths = "• تعاطف عميق.\n• قدرة على دعم الآخرين.\n• الإحساس بالهدف والمعنى.";
+        give.weaknesses = "• قد يحدث استنزاف عاطفي بسبب الميل للمساعدة المفرطة.";
+        give.recommendations =
+            "1. تحديد حدود صحية في العلاقات.\n" +
+            "2. تخصيص وقت أسبوعي للعناية الذاتية.\n" +
+            "3. ممارسة الامتنان مع الآخرين بصورة مقننة.";
+    }
+    else if (give.level === "متوسطة") {
+        give.analysis = "قدرتك على التعاطف موجودة لكن ليست ثابتة، وتحتاج إلى تقوية الاتصال بالآخرين.";
+        give.strengths = "• اهتمام جيد بالآخرين.\n• استعداد للمساعدة.\n• قدرة على بناء علاقات إيجابية.";
+        give.weaknesses = "• صعوبة في الاستمرار بالعطاء أثناء الضغط.\n• أحيانًا يتم تفسير التعاطف بشكل خاطئ.";
+        give.recommendations =
+            "1. ممارسة الإصغاء العميق.\n" +
+            "2. توسيع شبكة العلاقات بمحادثة إيجابية يومية.\n" +
+            "3. تدريب أسبوعي على خطوات التعاطف الأربعة.";
+    }
+    else {
+        give.analysis = "تحتاج إلى تعزيز التعاطف والهدف الشخصي وإظهار الاهتمام بالآخرين.";
+        give.strengths = "• رغبة داخلية في التحسن.\n• قابلية عالية للتطور الاجتماعي.";
+        give.weaknesses = "• ضعف في بناء الروابط.\n• صعوبة في إظهار التعاطف بوضوح.\n• انشغال بالمشاعر الذاتية أكثر من الآخرين.";
+        give.recommendations =
+            "1. ممارسة تمرين (Walk in Their Shoes).\n" +
+            "2. التواصل اليومي مع شخص واحد برسالة تقدير.\n" +
+            "3. ربط الأهداف الشخصية بهدف أوسع يخدم الآخرين.";
+    }
+
+    return { know, choose, give };
+}
+
+// ====================== توليد الرسم البياني - حجم مصغر ======================
+function generateChart(p1, p2, p3) {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'competencyChart';
+    
+    const chartContainer = document.createElement('div');
+    chartContainer.className = 'chart-container';
+    chartContainer.innerHTML = '<h3 style="text-align: center; color: #114b8a; margin-bottom: 10px; font-size: 16px;">الرسم البياني للكفاءات الثلاث</h3>';
+    chartContainer.appendChild(canvas);
+    
+    // إعداد الألوان بناءً على المستوى
+    const getColorForValue = (value) => {
+        if (value >= 80) return '#28a745'; // أخضر للمستوى المرتفع
+        if (value >= 60) return '#ffc107'; // أصفر للمستوى المتوسط
+        return '#dc3545'; // أحمر للمستوى المنخفض
+    };
+    
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['اعرف نفسك', 'اختر نفسك', 'امنح نفسك'],
+            datasets: [{
+                label: 'النسبة المئوية %',
+                data: [p1, p2, p3],
+                backgroundColor: [
+                    getColorForValue(p1),
+                    getColorForValue(p2),
+                    getColorForValue(p3)
+                ],
+                borderColor: [
+                    '#114b8a',
+                    '#114b8a',
+                    '#114b8a'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'النسبة المئوية %',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    ticks: {
+                        font: {
+                            size: 10
+                        }
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.parsed.y + '%';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    return chartContainer;
+}
+
+// ====================== توليد تحليل الكفاءات ======================
+function generateCompetencyAnalysis(report) {
+    const analysisContainer = document.createElement('div');
+    analysisContainer.className = 'competency-analysis';
+    analysisContainer.innerHTML = '<h3 style="text-align: center; color: #114b8a; margin-bottom: 15px; font-size: 16px;">تحليل مفصل للكفاءات الثلاث</h3>';
+    
+    // وظيفة مساعدة لإنشاء بطاقة كفاءة
+    const createCompetencyCard = (title, data, index) => {
+        const card = document.createElement('div');
+        card.className = 'competency-card';
+        
+        // تحديد لون المستوى
+        let levelClass = '';
+        if (data.level === 'مرتفعة') levelClass = 'level-high';
+        else if (data.level === 'متوسطة') levelClass = 'level-medium';
+        else levelClass = 'level-low';
+        
+        card.innerHTML = `
+            <h4>${index}. ${title} (الأسئلة ${index === 1 ? '1-20' : index === 2 ? '21-70' : '71-100'})</h4>
+            <div class="competency-level ${levelClass}">المستوى: ${data.level}</div>
+            
+            <div class="analysis-section">
+                <h5>📊 التحليل:</h5>
+                <p>${data.analysis}</p>
+            </div>
+            
+            <div class="analysis-section">
+                <h5>✅ نقاط القوة:</h5>
+                <p style="white-space: pre-line;">${data.strengths}</p>
+            </div>
+            
+            <div class="analysis-section">
+                <h5>⚠️ نقاط الضعف:</h5>
+                <p>${data.weaknesses}</p>
+            </div>
+            
+            <div class="analysis-section">
+                <h5>🎯 التوصيات:</h5>
+                <p style="white-space: pre-line;">${data.recommendations}</p>
+            </div>
+        `;
+        
+        return card;
+    };
+    
+    // إضافة بطاقات الكفاءات الثلاث
+    analysisContainer.appendChild(createCompetencyCard('اعرف نفسك', report.know, 1));
+    analysisContainer.appendChild(createCompetencyCard('اختر نفسك', report.choose, 2));
+    analysisContainer.appendChild(createCompetencyCard('امنح نفسك', report.give, 3));
+    
+    return analysisContainer;
+}
+
 // ====================== توليد نتائج مفصلة ======================
 function generateDetailedResults(res) {
-  return `
-    <div class="detailed-results">
-      <table>
-        <thead>
-          <tr>
-            <th>الكفاءة</th>
-            <th style="text-align:center;">الدرجة</th>
-            <th style="text-align:center;">النسبة</th>
-            <th style="text-align:right;">التقييم</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="font-weight:bold;">اعرف نفسك</td>
-            <td style="text-align:center;">${res.comp1} / 80</td>
-            <td style="text-align:center;">${res.p1}%</td>
-            <td style="color:${getColorByScore(res.p1)}; text-align:right;">${res.interp1.label}</td>
-          </tr>
-          <tr>
-            <td style="font-weight:bold;">اختر نفسك</td>
-            <td style="text-align:center;">${res.comp2} / 200</td>
-            <td style="text-align:center;">${res.p2}%</td>
-            <td style="color:${getColorByScore(res.p2)}; text-align:right;">${res.interp2.label}</td>
-          </tr>
-          <tr>
-            <td style="font-weight:bold;">امنح نفسك</td>
-            <td style="text-align:center;">${res.comp3} / 120</td>
-            <td style="text-align:center;">${res.p3}%</td>
-            <td style="color:${getColorByScore(res.p3)}; text-align:right;">${res.interp3.label}</td>
-          </tr>
-          <tr style="background:#f8f9fa; font-weight:bold;">
-            <td>المجموع الكلي</td>
-            <td style="text-align:center;">${res.total} / 400</td>
-            <td style="text-align:center;">${res.pTotal}%</td>
-            <td style="color:${getColorByScore(res.pTotal)}; text-align:right;">${res.interpTotal.label}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div style="margin-top: 15px; padding: 12px; background: #f1f5f9; border-radius: 6px;">
-        <h4 style="margin-top: 0;">توصيات:</h4>
-        <ul style="margin-bottom: 0;">
-          <li><strong>اعرف نفسك:</strong> ${res.interp1.advice}</li>
-          <li><strong>اختر نفسك:</strong> ${res.interp2.advice}</li>
-          <li><strong>امنح نفسك:</strong> ${res.interp3.advice}</li>
-        </ul>
-      </div>
-    </div>
-  `;
+    // إنشاء تحليل الكفاءات
+    const competencyReport = generateThreeCompetencyReport(res.p1, res.p2, res.p3);
+    
+    return `
+        <div class="detailed-results">
+            <table style="font-size: 14px;">
+                <thead>
+                    <tr>
+                        <th style="padding: 8px; font-size: 14px;">الكفاءة</th>
+                        <th style="padding: 8px; font-size: 14px; text-align:center;">الدرجة</th>
+                        <th style="padding: 8px; font-size: 14px; text-align:center;">النسبة</th>
+                        <th style="padding: 8px; font-size: 14px; text-align:right;">المستوى</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 8px; font-weight:bold;">اعرف نفسك (أسئلة 1-20)</td>
+                        <td style="padding: 8px; text-align:center;">${res.comp1} / 80</td>
+                        <td style="padding: 8px; text-align:center;">${res.p1}%</td>
+                        <td style="padding: 8px; color:${getColorByScore(res.p1)}; text-align:right;">${competencyReport.know.level}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight:bold;">اختر نفسك (أسئلة 21-70)</td>
+                        <td style="padding: 8px; text-align:center;">${res.comp2} / 200</td>
+                        <td style="padding: 8px; text-align:center;">${res.p2}%</td>
+                        <td style="padding: 8px; color:${getColorByScore(res.p2)}; text-align:right;">${competencyReport.choose.level}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; font-weight:bold;">امنح نفسك (أسئلة 71-100)</td>
+                        <td style="padding: 8px; text-align:center;">${res.comp3} / 120</td>
+                        <td style="padding: 8px; text-align:center;">${res.p3}%</td>
+                        <td style="padding: 8px; color:${getColorByScore(res.p3)}; text-align:right;">${competencyReport.give.level}</td>
+                    </tr>
+                    <tr style="background:#f8f9fa; font-weight:bold;">
+                        <td style="padding: 8px;">المجموع الكلي</td>
+                        <td style="padding: 8px; text-align:center;">${res.total} / 400</td>
+                        <td style="padding: 8px; text-align:center;">${res.pTotal}%</td>
+                        <td style="padding: 8px; color:${getColorByScore(res.pTotal)}; text-align:right;">
+                            ${res.pTotal >= 80 ? 'ممتاز' : res.pTotal >= 60 ? 'جيد' : res.pTotal >= 40 ? 'متوسط' : 'قليل'}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 // ====================== معالجة إرسال النتائج ======================
@@ -638,17 +988,28 @@ document.getElementById('submit').addEventListener('click',()=>{
   const res=calculateResults();
   const out=document.getElementById('output');
   if(res.error){alert(res.error);return;}
+  
+  // إنشاء تحليل الكفاءات
+  const competencyReport = generateThreeCompetencyReport(res.p1, res.p2, res.p3);
+  
   out.style.display='block';
   out.innerHTML=`
-    <h3>النتيجة النهائية: ${res.pTotal}% (${res.interpTotal.label})</h3>
+    <h3 style="margin-top: 0;">النتيجة النهائية: ${res.pTotal}%</h3>
     <p class="small">المجموع الكلي: ${res.total} من 400</p>
     <div class="bar"><span style="width:${res.pTotal}%"></span></div>
     ${generateDetailedResults(res)}
   `;
+  
+  // إضافة الرسم البياني
+  out.appendChild(generateChart(res.p1, res.p2, res.p3));
+  
+  // إضافة تحليل الكفاءات
+  out.appendChild(generateCompetencyAnalysis(competencyReport));
+  
   sendResultsToSheet(res);
 });
 
-// ====================== دالة لإنشاء وتحميل PDF ======================
+// ====================== دالة لإنشاء وتحميل PDF - معدلة لحل مشكلة السطور المفقودة ======================
 async function generateAndDownloadPDF() {
   const name = document.getElementById('studentName').value.trim();
   const studentClass = document.getElementById('studentClass').value.trim();
@@ -667,144 +1028,308 @@ async function generateAndDownloadPDF() {
   
   // عرض رسالة الانتظار
   const originalButtonText = document.getElementById('download').textContent;
+  const originalButtonState = document.getElementById('download').disabled;
   document.getElementById('download').textContent = '⏳ جاري إنشاء PDF...';
   document.getElementById('download').disabled = true;
   
   try {
-    // إنشاء محتوى HTML للـ PDF
+    // الحصول على النتائج
+    const form=document.getElementById('quiz');
+    const formData=new FormData(form);
+    const answers=[];
+    for(let i=0;i<questions.length;i++){
+      const v=formData.get('q'+i);
+      if(!v) {
+        alert('الرجاء الإجابة على جميع الأسئلة أولاً');
+        document.getElementById('download').textContent = originalButtonText;
+        document.getElementById('download').disabled = originalButtonState;
+        return;
+      }
+      answers.push(parseInt(v,10));
+    }
+    
+    const total=answers.reduce((a,b)=>a+b,0);
+    const comp1=answers.slice(0,20).reduce((a,b)=>a+b,0);
+    const comp2=answers.slice(20,70).reduce((a,b)=>a+b,0);
+    const comp3=answers.slice(70,100).reduce((a,b)=>a+b,0);
+
+    const max1=20*4; const max2=50*4; const max3=30*4; const maxtotal=100*4;
+    const pTotal=Math.round((total/maxtotal)*100);
+    const p1=Math.round((comp1/max1)*100);
+    const p2=Math.round((comp2/max2)*100);
+    const p3=Math.round((comp3/max3)*100);
+    
+    const res = {total,pTotal,comp1,comp2,comp3,p1,p2,p3};
+    
+    // إنشاء تحليل الكفاءات
+    const competencyReport = generateThreeCompetencyReport(res.p1, res.p2, res.p3);
+    
+    // إنشاء محتوى HTML للـ PDF - مع تحسينات لتناسب الصفحات
     const pdfContainer = document.getElementById('pdfContainer');
     const date = new Date().toLocaleDateString('ar-SA');
     
+    // ****** هذا هو HTML المعدل مع تقليل الهوامش ******
     pdfContainer.innerHTML = `
-      <div style="font-family: 'Arial', sans-serif; padding: 20px; text-align: right; position: relative;">
-        <!-- اللوجو في الركن العلوي الأيسر - حجم كبير -->
-        <div style="position: absolute; left: 20px; top: 20px;">
-          <img src="21csu.png" alt="لوجو مهارات القرن 21" style="height: 120px; width: auto;">
-        </div>
-        
-        <!-- العنوان -->
-        <div style="text-align: center; margin-bottom: 40px; padding: 15px; border-radius: 8px;">
-          <h1 style="margin: 0; font-size: 28px; color: #114b8a;">نتائج مقياس الذكاء العاطفي</h1>
-          <p style="margin: 10px 0 0 0; font-size: 16px; color: #666;">بناءً على نموذج 6seconds</p>
+      <div id="pdfContent" style="font-family: 'Arial', 'Segoe UI', sans-serif; text-align: right; direction: rtl; background: white; width: 794px; padding: 30px; box-sizing: border-box;">
+        <!-- العنوان الرئيسي -->
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #114b8a; padding-bottom: 10px;">
+          <h1 style="margin: 0 0 8px 0; font-size: 22px; color: #114b8a;">نتائج مقياس الذكاء العاطفي</h1>
+          <p style="margin: 0; font-size: 14px; color: #666;">بناءً على نموذج 6seconds</p>
         </div>
         
         <!-- معلومات الطالب -->
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 30px; border-right: 4px solid #0b5ed7; margin-top: 60px;">
-          <h3 style="margin: 0 0 15px 0; color: #114b8a; font-size: 18px;">معلومات الطالب:</h3>
-          <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
-            <div style="margin-left: 20px;">
-              <p style="margin: 8px 0; font-size: 16px;"><strong>الاسم:</strong> ${name}</p>
-              <p style="margin: 8px 0; font-size: 16px;"><strong>الفصل:</strong> ${studentClass}</p>
+        <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 20px; border-right: 3px solid #0b5ed7;">
+          <h3 style="margin: 0 0 8px 0; color: #114b8a; font-size: 14px;">معلومات الطالب</h3>
+          <div style="display: flex; justify-content: space-between; flex-wrap: wrap; font-size: 12px;">
+            <div>
+              <p style="margin: 4px 0;"><strong>الاسم:</strong> ${name}</p>
+              <p style="margin: 4px 0;"><strong>الفصل:</strong> ${studentClass}</p>
             </div>
             <div>
-              <p style="margin: 8px 0; font-size: 16px;"><strong>تاريخ الإختبار:</strong> ${date}</p>
-              <p style="margin: 8px 0; font-size: 16px;"><strong>عدد الأسئلة:</strong> 100 سؤال</p>
+              <p style="margin: 4px 0;"><strong>تاريخ الإختبار:</strong> ${date}</p>
+              <p style="margin: 4px 0;"><strong>عدد الأسئلة:</strong> 100 سؤال</p>
             </div>
           </div>
         </div>
         
         <!-- النتائج الإجمالية -->
-        <div style="background: #f1f5f9; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
-          <h3 style="margin: 0 0 20px 0; color: #114b8a; font-size: 18px;">النتيجة الإجمالية</h3>
-          ${document.querySelector('#output h3').outerHTML}
-          ${document.querySelector('#output .small').outerHTML}
-          ${document.querySelector('#output .bar').outerHTML}
+        <div style="background: #f1f5f9; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+          <h3 style="margin: 0 0 10px 0; color: #114b8a; font-size: 14px;">النتيجة الإجمالية</h3>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <div>
+              <h4 style="margin: 0; font-size: 20px; color: #495057;">${res.pTotal}%</h4>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">المجموع الكلي: ${res.total} من 400</p>
+            </div>
+            <div style="font-size: 12px; padding: 4px 10px; border-radius: 12px; background: ${getColorByScore(res.pTotal)}; color: white; font-weight: bold;">
+              ${res.pTotal >= 80 ? 'ممتاز' : res.pTotal >= 60 ? 'جيد' : res.pTotal >= 40 ? 'متوسط' : 'قليل'}
+            </div>
+          </div>
+          <div style="height: 8px; background: #e6eefc; border-radius: 4px; overflow: hidden; margin-top: 8px;">
+            <div style="height: 100%; background: ${getColorByScore(res.pTotal)}; width: ${res.pTotal}%;"></div>
+          </div>
         </div>
         
-        <!-- النتائج التفصيلية -->
-        <div style="margin-bottom: 30px;">
-          <h3 style="color: #114b8a; border-bottom: 2px solid #114b8a; padding-bottom: 10px; font-size: 18px;">تفصيل الكفاءات</h3>
-          ${document.querySelector('#output .detailed-results').innerHTML}
+        <!-- جدول النتائج التفصيلية -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #114b8a; border-bottom: 1px solid #114b8a; padding-bottom: 6px; font-size: 14px; margin-bottom: 12px;">تفصيل الكفاءات الثلاث</h3>
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; border: 1px solid #ddd;">
+            <thead>
+              <tr style="background: #114b8a; color: white;">
+                <th style="padding: 8px; text-align: right; border: 1px solid #ddd;">الكفاءة</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd;">الدرجة</th>
+                <th style="padding: 8px; text-align: center; border: 1px solid #ddd;">النسبة</th>
+                <th style="padding: 8px; text-align: right; border: 1px solid #ddd;">المستوى</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding: 8px; font-weight: bold; border: 1px solid #ddd;">اعرف نفسك</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.comp1} / 80</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.p1}%</td>
+                <td style="padding: 8px; color: ${getColorByScore(res.p1)}; text-align: right; font-weight: bold; border: 1px solid #ddd;">${competencyReport.know.level}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: bold; border: 1px solid #ddd;">اختر نفسك</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.comp2} / 200</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.p2}%</td>
+                <td style="padding: 8px; color: ${getColorByScore(res.p2)}; text-align: right; font-weight: bold; border: 1px solid #ddd;">${competencyReport.choose.level}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px; font-weight: bold; border: 1px solid #ddd;">امنح نفسك</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.comp3} / 120</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.p3}%</td>
+                <td style="padding: 8px; color: ${getColorByScore(res.p3)}; text-align: right; font-weight: bold; border: 1px solid #ddd;">${competencyReport.give.level}</td>
+              </tr>
+              <tr style="background: #f8f9fa; font-weight: bold;">
+                <td style="padding: 8px; border: 1px solid #ddd;">المجموع الكلي</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.total} / 400</td>
+                <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${res.pTotal}%</td>
+                <td style="padding: 8px; color: ${getColorByScore(res.pTotal)}; text-align: right; border: 1px solid #ddd;">${res.pTotal >= 80 ? 'ممتاز' : res.pTotal >= 60 ? 'جيد' : res.pTotal >= 40 ? 'متوسط' : 'قليل'}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         
-        <!-- التوصيات -->
-        <div style="background: #fff8e1; padding: 25px; border-radius: 8px; border: 2px solid #ffd54f; margin-bottom: 30px;">
-          <h3 style="margin: 0 0 15px 0; color: #ff8f00; font-size: 18px;">توصيات عامة</h3>
-          <p style="margin: 0; line-height: 1.6; font-size: 16px;">
-            بناءً على نتائجك، ننصحك بالتركيز على تطوير المهارات التي حصلت على تقييم أقل. 
-            يمكنك البدء بممارسة تمارين الذكاء العاطفي يوميًا لمدة 10 دقائق.
-          </p>
+        <!-- تحليل الكفاءات -->
+        <div style="margin-bottom: 20px;">
+          <h3 style="color: #114b8a; border-bottom: 1px solid #114b8a; padding-bottom: 6px; font-size: 14px; margin-bottom: 12px;">تحليل مفصل للكفاءات الثلاث</h3>
+          
+          <!-- كفاءة اعرف نفسك -->
+          <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-right: 2px solid ${getColorByScore(res.p1)}; page-break-inside: avoid;">
+            <h4 style="color: #114b8a; margin-top: 0; margin-bottom: 6px; font-size: 13px;">1. اعرف نفسك (أسئلة 1-20)</h4>
+            <div style="display: inline-block; padding: 2px 6px; border-radius: 10px; background: ${competencyReport.know.level === 'مرتفعة' ? '#d4edda' : competencyReport.know.level === 'متوسطة' ? '#fff3cd' : '#f8d7da'}; 
+                      color: ${competencyReport.know.level === 'مرتفعة' ? '#155724' : competencyReport.know.level === 'متوسطة' ? '#856404' : '#721c24'}; 
+                      font-size: 11px; font-weight: bold; margin-bottom: 6px;">
+              المستوى: ${competencyReport.know.level}
+            </div>
+            <div style="font-size: 11px; line-height: 1.4;">
+              <p style="margin: 5px 0;"><strong>📊 التحليل:</strong> ${competencyReport.know.analysis}</p>
+              <p style="margin: 5px 0;"><strong>✅ نقاط القوة:</strong><br>${competencyReport.know.strengths.replace(/\n/g, '<br>')}</p>
+              <p style="margin: 5px 0;"><strong>⚠️ نقاط الضعف:</strong> ${competencyReport.know.weaknesses}</p>
+              <p style="margin: 5px 0;"><strong>🎯 التوصيات:</strong><br>${competencyReport.know.recommendations.replace(/\n/g, '<br>')}</p>
+            </div>
+          </div>
+          
+          <!-- كفاءة اختر نفسك -->
+          <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-right: 2px solid ${getColorByScore(res.p2)}; page-break-inside: avoid;">
+            <h4 style="color: #114b8a; margin-top: 0; margin-bottom: 6px; font-size: 13px;">2. اختر نفسك (أسئلة 21-70)</h4>
+            <div style="display: inline-block; padding: 2px 6px; border-radius: 10px; background: ${competencyReport.choose.level === 'مرتفعة' ? '#d4edda' : competencyReport.choose.level === 'متوسطة' ? '#fff3cd' : '#f8d7da'}; 
+                      color: ${competencyReport.choose.level === 'مرتفعة' ? '#155724' : competencyReport.choose.level === 'متوسطة' ? '#856404' : '#721c24'}; 
+                      font-size: 11px; font-weight: bold; margin-bottom: 6px;">
+              المستوى: ${competencyReport.choose.level}
+            </div>
+            <div style="font-size: 11px; line-height: 1.4;">
+              <p style="margin: 5px 0;"><strong>📊 التحليل:</strong> ${competencyReport.choose.analysis}</p>
+              <p style="margin: 5px 0;"><strong>✅ نقاط القوة:</strong><br>${competencyReport.choose.strengths.replace(/\n/g, '<br>')}</p>
+              <p style="margin: 5px 0;"><strong>⚠️ نقاط الضعف:</strong> ${competencyReport.choose.weaknesses}</p>
+              <p style="margin: 5px 0;"><strong>🎯 التوصيات:</strong><br>${competencyReport.choose.recommendations.replace(/\n/g, '<br>')}</p>
+            </div>
+          </div>
+          
+          <!-- كفاءة امنح نفسك -->
+          <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; border-right: 2px solid ${getColorByScore(res.p3)}; page-break-inside: avoid;">
+            <h4 style="color: #114b8a; margin-top: 0; margin-bottom: 6px; font-size: 13px;">3. امنح نفسك (أسئلة 71-100)</h4>
+            <div style="display: inline-block; padding: 2px 6px; border-radius: 10px; background: ${competencyReport.give.level === 'مرتفعة' ? '#d4edda' : competencyReport.give.level === 'متوسطة' ? '#fff3cd' : '#f8d7da'}; 
+                      color: ${competencyReport.give.level === 'مرتفعة' ? '#155724' : competencyReport.give.level === 'متوسطة' ? '#856404' : '#721c24'}; 
+                      font-size: 11px; font-weight: bold; margin-bottom: 6px;">
+              المستوى: ${competencyReport.give.level}
+            </div>
+            <div style="font-size: 11px; line-height: 1.4;">
+              <p style="margin: 5px 0;"><strong>📊 التحليل:</strong> ${competencyReport.give.analysis}</p>
+              <p style="margin: 5px 0;"><strong>✅ نقاط القوة:</strong><br>${competencyReport.give.strengths.replace(/\n/g, '<br>')}</p>
+              <p style="margin: 5px 0;"><strong>⚠️ نقاط الضعف:</strong> ${competencyReport.give.weaknesses}</p>
+              <p style="margin: 5px 0;"><strong>🎯 التوصيات:</strong><br>${competencyReport.give.recommendations.replace(/\n/g, '<br>')}</p>
+            </div>
+          </div>
         </div>
         
         <!-- تذييل -->
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; color: #666; font-size: 14px;">
-          <p style="margin: 5px 0;">تم إنشاء هذا التقرير تلقائيًا بواسطة مقياس الذكاء العاطفي</p>
-          <p style="margin: 5px 0;">إعداد وبرمجة مشرف مهارات القرن 21 - مصطفى حسين</p>
-          <p style="margin: 5px 0;">جميع الحقوق محفوظة © ${new Date().getFullYear()}</p>
+        <div style="text-align: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid #ddd; color: #666; font-size: 10px;">
+          <p style="margin: 4px 0;">تم إنشاء هذا التقرير تلقائيًا بواسطة مقياس الذكاء العاطفي</p>
+          <p style="margin: 4px 0;">إعداد وبرمجة مشرف مهارات القرن 21 - مصطفى حسين</p>
+          <p style="margin: 4px 0;">جميع الحقوق محفوظة © ${new Date().getFullYear()}</p>
         </div>
       </div>
     `;
     
-    // انتظر لتحميل الصور والخطوط
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // انتظر لتحميل المحتوى
+    await new Promise(resolve => setTimeout(resolve, 300));
     
-    // استخدام html2canvas لالتقاط المحتوى
-    const canvas = await html2canvas(pdfContainer, {
-      scale: 2,
+    // ========== هذا هو الجزء الأهم لحل مشكلة السطور المفقودة ==========
+    const pdfContent = document.getElementById('pdfContent');
+    
+    // 1. أولاً: جرب تصدير صفحة واحدة إذا كان المحتوى قصيراً
+    const canvas = await html2canvas(pdfContent, {
+      scale: 1.2, // تقليل المقياس قليلاً
       useCORS: true,
       backgroundColor: '#ffffff',
-      logging: false
+      logging: false,
+      width: 794,
+      windowWidth: 794
     });
     
     // إنشاء PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
-      format: 'a4'
+      format: 'a4',
+      compress: true
     });
     
-    // إضافة الصورة إلى PDF
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = 190; // عرض A4 بالملم
+    // حساب الأبعاد
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = pageWidth - 20; // هامش 10مم من كل جانب
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
-    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+    console.log('ارتفاع الصورة بالملم:', imgHeight, 'ارتفاع الصفحة:', pageHeight);
+    
+    // 2. التحقق: إذا كان المحتوى يتناسب مع صفحة واحدة
+    if (imgHeight <= pageHeight) {
+      // إضافة المحتوى كامل في صفحة واحدة
+      pdf.addImage(canvas.toDataURL('image/png', 0.95), 'PNG', 
+        10, 10, imgWidth, imgHeight);
+        
+      // إضافة رقم الصفحة
+      pdf.setFontSize(9);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text('صفحة 1', pageWidth - 15, pageHeight - 5);
+      
+    } else {
+      // 3. تقسيم إلى صفحات بدون تداخل
+      const marginTop = 10; // هامش علوي 10مم
+      const marginBottom = 15; // هامش سفلي 15مم (يشمل رقم الصفحة)
+      const pageContentHeightMm = pageHeight - marginTop - marginBottom;
+      
+      // حساب عدد الصفحات المطلوبة
+      const totalPages = Math.ceil(imgHeight / pageContentHeightMm);
+      
+      console.log(`📄 سينشأ PDF بـ ${totalPages} صفحة`);
+      console.log(`📏 ارتفاع كل صفحة: ${pageContentHeightMm}مم من أصل ${pageHeight}مم`);
+      
+      for (let pageNum = 0; pageNum < totalPages; pageNum++) {
+        if (pageNum > 0) {
+          pdf.addPage();
+        }
+        
+        // حساب بداية ونهاية الجزء الحالي (بدون تداخل)
+        const sliceTopMm = pageNum * pageContentHeightMm;
+        const sliceBottomMm = Math.min((pageNum + 1) * pageContentHeightMm, imgHeight);
+        
+        // تحويل إلى نسب مئوية
+        const sliceTopRatio = sliceTopMm / imgHeight;
+        const sliceBottomRatio = sliceBottomMm / imgHeight;
+        
+        // تحويل النسب إلى بكسل
+        const sourceTopPx = Math.floor(canvas.height * sliceTopRatio);
+        const sourceBottomPx = Math.floor(canvas.height * sliceBottomRatio);
+        const sourceHeightPx = sourceBottomPx - sourceTopPx;
+        
+        // ارتفاع القطعة بالمليمتر (لـ PDF) - مهم: يجب أن يكون مساوياً لـ pageContentHeightMm
+        const sliceHeightMm = sliceBottomMm - sliceTopMm;
+        
+        console.log(`الصفحة ${pageNum + 1}: من ${sliceTopMm.toFixed(1)}مم إلى ${sliceBottomMm.toFixed(1)}مم (${sourceHeightPx} بكسل)`);
+        
+        // إنشاء canvas للقطعة الحالية
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = canvas.width;
+        sliceCanvas.height = sourceHeightPx;
+        const ctx = sliceCanvas.getContext('2d');
+        
+        // قص القطعة من الصورة الأصلية
+        ctx.drawImage(canvas, 
+          0, sourceTopPx, canvas.width, sourceHeightPx,
+          0, 0, canvas.width, sourceHeightPx
+        );
+        
+        // إضافة القطعة إلى PDF
+        pdf.addImage(sliceCanvas.toDataURL('image/png', 0.95), 'PNG',
+          10, marginTop, imgWidth, sliceHeightMm);
+        
+        // إضافة رقم الصفحة في الأسفل
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`- ${pageNum + 1} -`, pageWidth - 15, pageHeight - 5);
+        
+        // إضافة خط فاصل بين الصفحات للمساعدة في التصحيح (اختياري)
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(10, marginTop + sliceHeightMm + 0.5, pageWidth - 10, marginTop + sliceHeightMm + 0.5);
+      }
+    }
     
     // حفظ الملف
-    const fileName = `نتائج_الذكاء_العاطفي_${name}_${studentClass}_${date}.pdf`.replace(/\s+/g, '_');
+    const fileName = `نتائج_الذكاء_العاطفي_${name.replace(/\s+/g, '_')}_${studentClass.replace(/\s+/g, '_')}_${date.replace(/\//g, '-')}.pdf`;
     pdf.save(fileName);
     
-    console.log('تم إنشاء PDF بنجاح');
+    console.log('✅ تم إنشاء PDF بنجاح');
     
   } catch (error) {
-    console.error('خطأ في إنشاء PDF:', error);
+    console.error('❌ خطأ في إنشاء PDF:', error);
     alert('حدث خطأ أثناء إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
-    
-    // بديل: إنشاء PDF نصي مباشر مع اللوجو
-    try {
-      const pdf = new jsPDF();
-      const name = document.getElementById('studentName').value.trim();
-      const studentClass = document.getElementById('studentClass').value.trim();
-      const date = new Date().toLocaleDateString('ar-SA');
-      
-      // إضافة النص العربي بشكل صحيح
-      pdf.setFontSize(18);
-      pdf.text('نتائج مقياس الذكاء العاطفي', 105, 20, null, null, 'center');
-      
-      pdf.setFontSize(12);
-      pdf.text(`الاسم: ${name}`, 20, 40);
-      pdf.text(`الفصل: ${studentClass}`, 20, 50);
-      pdf.text(`التاريخ: ${date}`, 20, 60);
-      
-      pdf.setFontSize(14);
-      pdf.text('النتائج:', 20, 80);
-      
-      const results = document.querySelector('#output');
-      if(results) {
-        const resultText = results.innerText;
-        const lines = pdf.splitTextToSize(resultText, 170);
-        pdf.text(lines, 20, 90);
-      }
-      
-      pdf.save(`نتائج_الذكاء_العاطفي_${name}.pdf`);
-    } catch (fallbackError) {
-      console.error('خطأ في البديل:', fallbackError);
-      alert('تعذر إنشاء ملف PDF. يرجى التأكد من اتصال الإنترنت.');
-    }
   } finally {
     // إعادة تعيين حالة الزر
     document.getElementById('download').textContent = originalButtonText;
-    document.getElementById('download').disabled = false;
+    document.getElementById('download').disabled = originalButtonState;
   }
 }
 
